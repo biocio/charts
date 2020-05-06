@@ -44,6 +44,7 @@ The following table lists the configurable parameters of the fluentd chart and t
 
 Parameter | Description | Default
 --- | --- | ---
+`useStatefulSet` | Deploy as a StatefulSet regardless of whether autoscaling is enabled | `nil`
 `affinity` | node/pod affinities | `{}`
 `configMaps` | Fluentd configuration | See [values.yaml](values.yaml)
 `output.host` | output host | `elasticsearch-client.default.svc.cluster.local`
@@ -57,6 +58,8 @@ Parameter | Description | Default
 `image.tag` | Image tag | `v2.4.0`
 `imagePullSecrets` | Specify image pull secrets | `nil` (does not add image pull secrets to deployed pods)
 `extraEnvVars` | Adds additional environment variables to the deployment (in yaml syntax) | `{}` See [values.yaml](values.yaml)
+`extraVolumeMounts` | Mount extra volumes (in yaml syntax) | `` See [values.yaml](values.yaml)
+`extraVolumes` | Extra volumes (in yaml syntax) | `` See [values.yaml](values.yaml)
 `ingress.enabled` | enable ingress | `false`
 `ingress.labels` | list of labels for the ingress rule | See [values.yaml](values.yaml)
 `ingress.annotations` | list of annotations for the ingress rule | `kubernetes.io/ingress.class: nginx` See [values.yaml](values.yaml)

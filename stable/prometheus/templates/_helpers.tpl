@@ -7,6 +7,13 @@ Expand the name of the chart.
 {{- end -}}
 
 {{/*
+Create chart name and version as used by the chart label.
+*/}}
+{{- define "prometheus.chart" -}}
+{{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" -}}
+{{- end -}}
+
+{{/*
 Create unified labels for prometheus components
 */}}
 {{- define "prometheus.common.matchLabels" -}}
@@ -15,7 +22,7 @@ release: {{ .Release.Name }}
 {{- end -}}
 
 {{- define "prometheus.common.metaLabels" -}}
-chart: {{ .Chart.Name }}-{{ .Chart.Version }}
+chart: {{ template "prometheus.chart" . }}
 heritage: {{ .Release.Service }}
 {{- end -}}
 
@@ -26,16 +33,6 @@ heritage: {{ .Release.Service }}
 
 {{- define "prometheus.alertmanager.matchLabels" -}}
 component: {{ .Values.alertmanager.name | quote }}
-{{ include "prometheus.common.matchLabels" . }}
-{{- end -}}
-
-{{- define "prometheus.kubeStateMetrics.labels" -}}
-{{ include "prometheus.kubeStateMetrics.matchLabels" . }}
-{{ include "prometheus.common.metaLabels" . }}
-{{- end -}}
-
-{{- define "prometheus.kubeStateMetrics.matchLabels" -}}
-component: {{ .Values.kubeStateMetrics.name | quote }}
 {{ include "prometheus.common.matchLabels" . }}
 {{- end -}}
 
@@ -100,23 +97,6 @@ We truncate at 63 chars because some Kubernetes name fields are limited to this 
 {{- printf "%s-%s" .Release.Name .Values.alertmanager.name | trunc 63 | trimSuffix "-" -}}
 {{- else -}}
 {{- printf "%s-%s-%s" .Release.Name $name .Values.alertmanager.name | trunc 63 | trimSuffix "-" -}}
-{{- end -}}
-{{- end -}}
-{{- end -}}
-
-{{/*
-Create a fully qualified kube-state-metrics name.
-We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
-*/}}
-{{- define "prometheus.kubeStateMetrics.fullname" -}}
-{{- if .Values.kubeStateMetrics.fullnameOverride -}}
-{{- .Values.kubeStateMetrics.fullnameOverride | trunc 63 | trimSuffix "-" -}}
-{{- else -}}
-{{- $name := default .Chart.Name .Values.nameOverride -}}
-{{- if contains $name .Release.Name -}}
-{{- printf "%s-%s" .Release.Name .Values.kubeStateMetrics.name | trunc 63 | trimSuffix "-" -}}
-{{- else -}}
-{{- printf "%s-%s-%s" .Release.Name $name .Values.kubeStateMetrics.name | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
 {{- end -}}
 {{- end -}}
@@ -221,17 +201,6 @@ Create the name of the service account to use for the alertmanager component
     {{ default (include "prometheus.alertmanager.fullname" .) .Values.serviceAccounts.alertmanager.name }}
 {{- else -}}
     {{ default "default" .Values.serviceAccounts.alertmanager.name }}
-{{- end -}}
-{{- end -}}
-
-{{/*
-Create the name of the service account to use for the kubeStateMetrics component
-*/}}
-{{- define "prometheus.serviceAccountName.kubeStateMetrics" -}}
-{{- if .Values.serviceAccounts.kubeStateMetrics.create -}}
-    {{ default (include "prometheus.kubeStateMetrics.fullname" .) .Values.serviceAccounts.kubeStateMetrics.name }}
-{{- else -}}
-    {{ default "default" .Values.serviceAccounts.kubeStateMetrics.name }}
 {{- end -}}
 {{- end -}}
 
